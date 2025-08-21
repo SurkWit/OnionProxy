@@ -67,9 +67,10 @@
    ```
 
 ### Запуск
-1. Перейдите в директорию проекта:
+1. Клонируйте репозиторий и перейдите в директорию проекта:
    ```bash
-   cd /path/to/OnionProxy
+   git clone https://github.com/SurkWit/OnionProxy
+   cd OnionProxy
    ```
 2. (Опционально) Запустите скрипт установки зависимостей:
    ```bash
@@ -159,9 +160,10 @@ A lightweight way to run a local SOCKS5 proxy over Tor with support for obfs4 br
    ```
 
 ### Usage
-1. Navigate to the project directory:
+1. Clone the repository and navigate to the project directory:
    ```bash
-   cd /path/to/OnionProxy
+   git clone https://github.com/SurkWit/OnionProxy
+   cd OnionProxy
    ```
 2. (Optional) Run the dependency installation script:
    ```bash

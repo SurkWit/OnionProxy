@@ -313,7 +313,8 @@ def main():
         print("   Установите: pkg install obfs4proxy\033[0m")
         time.sleep(3)
 
-    protocol_choice = show_protocol_menu()
+    # Автоматический выбор протокола без запроса у пользователя
+    protocol_choice = '2'
     selected_protocol = PROTOCOLS[protocol_choice]
     
     print(f"\033[1;32m✓ Выбран протокол: {selected_protocol['name']}\033[0m")

@@ -17,7 +17,7 @@ check_command() {
     else
         echo -e "${RED}✗ $1 is not installed${NC}"
         return 1
-    }
+    fi
 }
 
 # Function to check if a Python module is installed
@@ -29,7 +29,7 @@ check_python_module() {
     else
         echo -e "${RED}✗ Python module $1 is not installed${NC}"
         return 1
-    }
+    fi
 }
 
 # Detect OS
