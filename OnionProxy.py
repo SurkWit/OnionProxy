@@ -22,6 +22,18 @@ PASSWORD = "proxypass"
 TOR_CHECK_URL = "https://check.torproject.org/api/ip"
 
 PROTOCOLS = {
+    "1": {
+        "name": "SOCKS5 + obfs4 мосты без логина и пароля",
+        "port": 1082,
+        "bridges": [
+            "obfs4 64.23.136.154:53640 969202413807802849B9CCF6D781B0DAC3C255E8 cert=pACn2AIVKFDJqlMMcv5uPKZ34Y8rnKyDe0cbxHIuUsdLtzY/O3I3JkfbzJ4LpoXdtWv4Mw iat-mode=0",
+            "obfs4 91.229.62.14:8042 60FBE30CDAD05EA2E43A84A03303811C74C71E2A cert=viLwWECfGgkNnVUEG1Sr1KD58JXBizufcENJwtaqoI9/cP2xYHY/HBY5HGrHpdI/ZM3/Og iat-mode=0",
+            "obfs4 51.38.220.35:42954 B84BDFE3724928B06FC178FF50D5852E5AB7942A cert=6tpTDdnOaRl2elQqdxSmrJ5Gt9JkWcbquznpxx/lqVjRKv/bVecFnXie96KoblCWfvVjYA iat-mode=0",
+            "obfs4 51.38.220.224:30996 22494A012CFA8C88B1D907E2CCB8409AC35B537B cert=dOPijSCG6FD89fYv5N2F9QoeK1od3tpG6VBE/kMY0Bt1aW/7aXPIzsENDoLWZe43gI8efw iat-mode=0"
+        ],
+        "transport": "obfs4",
+        "description": "SOCKS5 с obfs4 мостами для обхода блокировок без логина и пароля"
+    },
     "2": {
         "name": "SOCKS5 + obfs4 мосты",
         "port": 1081,
@@ -67,7 +79,7 @@ def show_protocol_menu():
     
     while True:
         try:
-            choice = input("\033[1;33mВведите номер протокола (2) или 'i' для инструкций: \033[0m").strip()
+            choice = input("\033[1;33mВведите номер протокола (1 или 2) или 'i' для инструкций: \033[0m").strip()
             if choice.lower() == 'i':
                 print_install_instructions()
                 print("\033[1;36m" + "-" * 60 + "\033[0m")
@@ -150,7 +162,7 @@ def test_tor_connection(protocol_config, retries: int = 8, delay_seconds: int = 
 
     for attempt in range(1, retries + 1):
         try:
-            response = requests.get(TOR_CHECK_URL, proxies=proxies, timeout=25)
+            response = requests.get(TOR_CHECK_URL, proxies=proxies, timeout=5)
             if response.status_code == 200:
                 content_type = (response.headers.get('Content-Type') or '').lower()
                 ip: Optional[str] = None
@@ -242,8 +254,12 @@ def display_proxy_info(protocol_config):
     print(f"\033[1;37m🌐 IP адрес:\033[0m \033[1;32m{SOCKS_IP}\033[0m")
     print(f"\033[1;37m🚪 Порт:\033[0m \033[1;32m{port}\033[0m")
     
-    print(f"\033[1;37m👤 Имя пользователя:\033[0m \033[1;32m{USERNAME}\033[0m")
-    print(f"\033[1;37m🔐 Пароль:\033[0m \033[1;32m{PASSWORD}\033[0m")
+    if port == 1081:
+        print(f"\033[1;37m👤 Имя пользователя:\033[0m \033[1;32m{USERNAME}\033[0m")
+        print(f"\033[1;37m🔐 Пароль:\033[0m \033[1;32m{PASSWORD}\033[0m")
+    else:
+        print(f"\033[1;37m👤 Аутентификация:\033[0m \033[1;32mНе требуется\033[0m")
+    
     print(f"\033[1;37m📱 Тип прокси:\033[0m \033[1;32mSOCKS5\033[0m")
     
     print("\033[1;36m" + "-" * 60 + "\033[0m")
@@ -254,13 +270,19 @@ def display_proxy_info(protocol_config):
     print("\033[1;34m🔷 Telegram:\033[0m")
     print("   Настройки → Данные и память → Настройки прокси")
     print(f"   Тип: SOCKS5 | Сервер: {SOCKS_IP} | Порт: {port}")
-    print(f"   Логин: {USERNAME} | Пароль: {PASSWORD}")
+    if port == 1081:
+        print(f"   Логин: {USERNAME} | Пароль: {PASSWORD}")
+    else:
+        print("   Логин и пароль не требуются")
     print()
     
     print("\033[1;34m🔷 Discord:\033[0m")
     print("   Настройки → Голос и видео → Настройки прокси")
     print(f"   Тип: SOCKS5 | Хост: {SOCKS_IP} | Порт: {port}")
-    print(f"   Имя пользователя: {USERNAME} | Пароль: {PASSWORD}")
+    if port == 1081:
+        print(f"   Имя пользователя: {USERNAME} | Пароль: {PASSWORD}")
+    else:
+        print("   Логин и пароль не требуются")
     print()
     
     print("\033[1;34m🔷 Браузеры:\033[0m")
@@ -313,13 +335,9 @@ def main():
         print("   Установите: pkg install obfs4proxy\033[0m")
         time.sleep(3)
 
-    # Автоматический выбор протокола без запроса у пользователя
-    protocol_choice = '2'
+    protocol_choice = show_protocol_menu()
     selected_protocol = PROTOCOLS[protocol_choice]
     
-    print(f"\033[1;32m✓ Выбран протокол: {selected_protocol['name']}\033[0m")
-    time.sleep(1)
-
     tor_process = start_tor(selected_protocol)
     if not tor_process:
         print("\033[1;31m❌ Не удалось запустить Tor\033[0m")
